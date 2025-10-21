@@ -5,6 +5,8 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <signal.h>
+#ifndef STUB_H
+#define STUB_H
 
 enum operations {
     READY_TO_SHUTDOWN = 0,
@@ -19,9 +21,12 @@ struct message {
 };
 
 
-int inicialize_connection(char * IP, char * port);
+int inicialize_connection(char *, char *);
 int READY_TO_SHUTDOWN();
 int SHUTDOWN_NOW();
 int SHUTDOWN_ACK(); 
-int get_clock_lamport();
+int get_clock_lamport(int);
+int max(int, int);
 void shutdown();
+
+#endif // STUB_H
