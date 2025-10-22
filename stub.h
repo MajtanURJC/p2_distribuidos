@@ -20,11 +20,22 @@ struct message {
     unsigned int clock_lamport;
 };
 
+struct lamport {
+    int lr;
+    int lc;
+}
+
+struct sockets {
+    int client_sock;
+    int server_sock;
+    int clients[];
+}
+
 
 int inicialize_connection(char *, char *);
-int READY_TO_SHUTDOWN();
-int SHUTDOWN_NOW();
-int SHUTDOWN_ACK(); 
+int ready_to_shutdown();
+int shutdown_now();
+int shutdown_ack(); 
 int get_clock_lamport(int);
 int max(int, int);
 void shutdown();
