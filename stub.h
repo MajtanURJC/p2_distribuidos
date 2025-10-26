@@ -1,12 +1,16 @@
+#ifndef STUB_H
+#define STUB_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/select.h>
+#include <pthread.h>
 #include <signal.h>
-#ifndef STUB_H
-#define STUB_H
+#include <pthread.h>
 
 enum operations {
     READY_TO_SHUTDOWN = 0,
@@ -23,21 +27,23 @@ struct message {
 struct lamport {
     int lr;
     int lc;
-}
+};
 
 struct sockets {
     int client_sock;
     int server_sock;
-    int clients[];
-}
+};
 
 
-int inicialize_connection(char *, char *);
+int initialize_server_connection(char *IP, char *port);
+int initialize_client_connection(char *IP, char *port);
 int ready_to_shutdown();
 int shutdown_now();
-int shutdown_ack(); 
-int get_clock_lamport(int);
-int max(int, int);
-void shutdown();
+int shutdown_ack();
+int get_clock_lamport();
+void set_process_name(const char *name);
+void update_lamport();
+void update_lamport_send();
+void control_exit();
 
-#endif // STUB_H
+#endif
