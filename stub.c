@@ -8,7 +8,8 @@ char process_name[20];
 pthread_t receiver_thread[2];
 int temp_sockets[2];
 int finish = 0;
-int n_threads = 0;
+int num_clients = 0;
+int correct_finished = 0;
 
 int max(int a, int b) {
     if (a > b) return a;
@@ -137,6 +138,12 @@ void *receive_loop_server(void *arg) {
                 continue;
             }
 
+            if(msg.action == SHUTDOWN_ACK) {
+                pthread_mutex_lock(&lamport_mutex);
+                correct_finished ++;
+                pthread_mutex_unlock(&lamport_mutex);
+            }
+
             if (strcmp(msg.origin,"P1") == 0 && p1_fulled == 0) {
                 sockets.P1_socket = sock;
                 p1_fulled = 1;
@@ -144,6 +151,7 @@ void *receive_loop_server(void *arg) {
                 sockets.P3_socket = sock;
                 p3_fulled = 1;
             }
+
 
             pthread_mutex_lock(&lamport_mutex);
             lamport.lr = msg.clock_lamport;
@@ -205,21 +213,21 @@ int initialize_server_connection(char *IP, char *port) {
         return -1;
     }
 
-    while (n_threads < 2) {
+    while (num_clients < 2) {
         struct sockaddr_in client_addr;
         socklen_t client_len = sizeof(client_addr);
-        temp_sockets[n_threads] = accept(sockfd, (struct sockaddr *)&client_addr, &client_len);
-        if (temp_sockets[n_threads] < 0) {
+        temp_sockets[num_clients] = accept(sockfd, (struct sockaddr *)&client_addr, &client_len);
+        if (temp_sockets[num_clients] < 0) {
             perror("Error on accept");
             close(sockfd);
             return -1;
         }
         
-        if(pthread_create(&receiver_thread[n_threads], NULL, receive_loop_server, &temp_sockets[n_threads]) < 0) {
+        if(pthread_create(&receiver_thread[num_clients], NULL, receive_loop_server, &temp_sockets[num_clients]) < 0) {
             perror("Error on thread create");
             break;
         }
-        n_threads ++;
+        num_clients ++;
     }
 
     close(sockfd);
@@ -256,8 +264,8 @@ int initialize_client_connection(char *IP, char *port) {
         return -1;
     }
 
-    n_threads ++;
-    pthread_create(&receiver_thread[n_threads], NULL, receive_loop, &sockets.client_sock);
+    num_clients ++;
+    pthread_create(&receiver_thread[num_clients], NULL, receive_loop, &sockets.client_sock);
 
     return 0;
 }
@@ -317,15 +325,17 @@ void control_exit() {
     finish = 1;
     pthread_mutex_unlock(&lamport_mutex);
 
+    for(int i = 0; i < num_clients; i++) {
+        pthread_join(receiver_thread[i], NULL);
+    }  
+
     if(strcmp(process_name,"P1") == 0 || strcmp(process_name,"P3") == 0) {
         close(sockets.client_sock);
     } else {
         close(sockets.P3_socket);
         close(sockets.P1_socket);
-        printf("Los clientes fueron correctamente apagados en t(lamport) = %d\n", lamport.lc);
+        if(correct_finished == num_clients) {
+            printf("Los clientes fueron correctamente apagados en t(lamport) = %d\n", lamport.lc);
+        }
     }
-
-    for(int i = 0; i < n_threads; i++) {
-        pthread_join(receiver_thread[i], NULL);
-    }  
 }
