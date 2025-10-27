@@ -25,12 +25,16 @@ int main(int argc, char *argv[]) {
 
     ready_to_shutdown();
 
-    while (get_clock_lamport() != 4) {
+    while (get_clock_lamport() != 5) {
         usleep(100000); // 100ms
         printf("%d",get_clock_lamport());
     }
 
     shutdown_ack();
+
+    while (get_clock_lamport() != 6) {
+        usleep(100000); // 100ms
+    }
 
     control_exit();
 

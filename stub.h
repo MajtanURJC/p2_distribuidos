@@ -32,6 +32,8 @@ struct lamport {
 struct sockets {
     int client_sock;
     int server_sock;
+    int p1_socket;
+    int p3_socket;
 };
 
 
@@ -42,7 +44,6 @@ int shutdown_now();
 int shutdown_ack();
 int get_clock_lamport();
 void set_process_name(const char *name);
-void update_lamport();
 void update_lamport_send();
 void control_exit();
 

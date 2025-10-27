@@ -15,32 +15,24 @@ int main(int argc, char *argv[]) {
     char *PORT = argv[2];
 
     // Nombre del proceso
-    set_process_name("P2");
-
+    set_process_name("P3");
 
     // Inicializar conexión con P2
-    if (initialize_server_connection(IP, PORT) < 0) {
-        fprintf(stderr, "Error al crear el server\n");
+    if (initialize_client_connection(IP, PORT) < 0) {
+        fprintf(stderr, "Error al conectar con P2\n");
         exit(EXIT_FAILURE);
     }
 
-    printf("Hola");
+    ready_to_shutdown();
 
-    while (get_clock_lamport() != 3) {
+    while (get_clock_lamport() != 9) {
         usleep(100000); // 100ms
         printf("%d",get_clock_lamport());
     }
 
-    shutdown_now();
+    shutdown_ack();
 
-    while (get_clock_lamport() != 7) {
-        usleep(100000); // 100ms
-        printf("%d",get_clock_lamport());
-    }
-
-    shutdown_now();
-
-    while (get_clock_lamport() != 11) {
+    while (get_clock_lamport() != 10) {
         usleep(100000); // 100ms
     }
 
