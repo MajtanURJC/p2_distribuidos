@@ -24,18 +24,14 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    printf("Hola");
-
     while (get_clock_lamport() != 3) {
         usleep(100000); // 100ms
-        printf("%d",get_clock_lamport());
     }
 
     shutdown_now();
 
     while (get_clock_lamport() != 7) {
         usleep(100000); // 100ms
-        printf("%d",get_clock_lamport());
     }
 
     shutdown_now();

@@ -32,8 +32,8 @@ struct lamport {
 struct sockets {
     int client_sock;
     int server_sock;
-    int p1_socket;
-    int p3_socket;
+    int P1_socket;
+    int P3_socket;
 };
 
 

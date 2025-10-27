@@ -27,7 +27,6 @@ int main(int argc, char *argv[]) {
 
     while (get_clock_lamport() != 9) {
         usleep(100000); // 100ms
-        printf("%d",get_clock_lamport());
     }
 
     shutdown_ack();
